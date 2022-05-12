@@ -13,6 +13,8 @@
 </template>
 
 <script>
+const xmlParser = new window.DOMParser()
+
 export default {
   name: 'BggGame',
   props: {
@@ -23,7 +25,6 @@ export default {
   },
   data () {
     return {
-      xmlParser: new window.DOMParser(),
       imageUrl: '',
       name: '',
       year: ''
@@ -41,15 +42,12 @@ export default {
     }
   },
   methods: {
-    parseXml (xmlStr) {
-      return this.xmlParser.parseFromString(xmlStr, 'text/xml')
-    },
-    loadGame (newId) {
-      fetch(`https://api.geekdo.com/xmlapi2/thing?type=boardgame&id=${newId}`)
+    loadGame (id) {
+      fetch(`https://api.geekdo.com/xmlapi2/thing?type=boardgame&id=${id}`)
         .then(response => response.text())
-        .then(xml => this.parseXml(xml))
+        .then(xml => xmlParser.parseFromString(xml, 'text/xml'))
         .then(gameDom => {
-          const item = gameDom.getElementById(newId)
+          const item = gameDom.getElementById(id)
           this.imageUrl = item.querySelector('image').textContent
           this.name = item.querySelector('name[type="primary"]').getAttribute('value')
           this.year = item.querySelector('yearpublished').getAttribute('value')
